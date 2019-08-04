@@ -1,0 +1,46 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+
+    redis:
+      image: redis:alpine
+      container_name: php-dev-task-redis
+
+    mariadb:
+      image: mariadb:10.4
+      container_name: php-dev-task-mariadb
+      working_dir: /application
+      volumes:
+        - .:/application
+      environment:
+        - MYSQL_ROOT_PASSWORD=adatbazis
+        - MYSQL_DATABASE=forum-task
+        - MYSQL_USER=forum-task-user
+        - MYSQL_PASSWORD=adatbazis0000
+      ports:
+        - "1028:3306"
+
+    elasticsearch:
+      image: elasticsearch:6.5.4
+      container_name: php-dev-task-elasticsearch
+
+    webserver:
+      image: nginx:alpine
+      container_name: php-dev-task-webserver
+      working_dir: /application
+      volumes:
+          - .:/application
+          - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      ports:
+       - "1025:80"
+
+    php-fpm:
+      build: phpdocker/php-fpm
+      container_name: php-dev-task-php-fpm
+      working_dir: /application
+      volumes:
+        - .:/application
+        - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
+
